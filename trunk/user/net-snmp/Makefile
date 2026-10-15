@@ -78,6 +78,7 @@ configure:
 		--disable-shared \
 		--enable-static \
 		--with-mib-modules="mibII/ip mibII/at" \
+		--with-out-mib-modules="host" \
 		--without-openssl \
 		--without-libwrap \
 		--without-kmem-usage \

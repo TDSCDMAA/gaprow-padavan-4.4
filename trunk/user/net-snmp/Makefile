@@ -27,13 +27,30 @@ THISDIR  = $(shell pwd)
 #     - preset ac_cv_* for capabilities that cannot be probed
 #  3) Size control: keep only snmpd, no manuals, no trapd.
 #
+# pcre.h is needed by net-snmp (include/net-snmp/data_access/interface.h,
+# agent/mibgroup/hardware/fsys/hw_fsys.h). Padavan builds libpcre but the header
+# may not be present in $(STAGEDIR)/include at net-snmp build time, so we add the
+# libpcre source dir to the include path as a fallback.
+PCRE_SRCDIR = $(ROOTDIR)/libs/libpcre/pcre-8.43
+
 NETSNMP_CFLAGS  = -Os -ffunction-sections -fdata-sections -D_GNU_SOURCE
 NETSNMP_CFLAGS += -I$(STAGEDIR)/include
+NETSNMP_CFLAGS += -I$(PCRE_SRCDIR)
 NETSNMP_LDFLAGS = -Wl,--gc-sections
 NETSNMP_LDFLAGS += -L$(STAGEDIR)/lib
 
 # Pre-answered configure cache entries to avoid un-probeable checks
+#
+# IMPORTANT: force HAVE_PCRE_H off. configure probes the *host* /usr/include
+# and reports "checking for pcre.h... yes", which makes net-snmp generate
+# "#define HAVE_PCRE_H 1". But the cross toolchain (mipsel-linux-uclibc-gcc)
+# then cannot find <pcre.h> when compiling data_access/interface.h and
+# hardware/fsys/hw_fsys.h -> "fatal error: pcre.h: No such file or directory".
+# net-snmp guards all pcre usage with "#if defined(HAVE_PCRE_H)" and falls back
+# to POSIX regex, so disabling it is safe for a router agent.
 NETSNMP_CACHE = \
+	ac_cv_header_pcre_h=no \
+	ac_cv_header_regex_h=yes \
 	ac_cv_ETC_MNTTAB=/etc/mtab \
 	ac_cv_etype=int \
 	ac_cv_have_struct_sockaddr_storage=yes \

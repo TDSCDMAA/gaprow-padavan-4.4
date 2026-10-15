@@ -36,9 +36,10 @@ jobs:
         sudo apt-get -y install unzip libtool-bin curl cmake gperf gawk flex bison nano xxd fakeroot \
         cpio git python3-docutils gettext automake autopoint texinfo build-essential help2man \
         pkg-config zlib1g-dev libgmp3-dev libmpc-dev libmpfr-dev libncurses5-dev libltdl-dev wget
-    - name: Clone source code
+    - name: Use repository source code
       run: |
-        git clone --depth=1 https://github.com/gaprow/padavan-4.4.git /opt/rt-n56u
+        # 使用本仓库（含 net-snmp 改动）的源码，而不是上游 gaprow/padavan-4.4
+        cp -a "$GITHUB_WORKSPACE" /opt/rt-n56u
         cd /opt/rt-n56u/toolchain-mipsel
         sh dl_toolchain.sh
         mkdir -p /opt/images/
@@ -61,6 +62,10 @@ jobs:
         sed -i 's/CONFIG_FIRMWARE_INCLUDE_SCUTCLIENT=y/CONFIG_FIRMWARE_INCLUDE_SCUTCLIENT=n/g' .config
         sed -i 's/CONFIG_FIRMWARE_INCLUDE_SRELAY=y/CONFIG_FIRMWARE_INCLUDE_SRELAY=n/g' .config
         sed -i 's/CONFIG_FIRMWARE_INCLUDE_SHADOWSOCKS=y/CONFIG_FIRMWARE_INCLUDE_SHADOWSOCKS=n/g' .config
+        ##############################################################
+        #net-snmp：暴露 ARP 表（ipNetToMediaTable）供上层 L3 设备跨三层发现真实 MAC
+        sed -i '/CONFIG_FIRMWARE_INCLUDE_NET_SNMP/d' .config
+        echo "CONFIG_FIRMWARE_INCLUDE_NET_SNMP=y" >> .config
         ######################################################################
         #以下选项是定义你需要的功能（y=集成,n=忽略），重新写入到.config文件
         ######################################################################

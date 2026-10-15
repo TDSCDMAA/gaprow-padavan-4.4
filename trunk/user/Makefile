@@ -115,6 +115,7 @@ dir_$(CONFIG_FIRMWARE_INCLUDE_ANTFS)		+= antfs
 dir_y						+= infosvr
 dir_y						+= inadyn
 dir_y						+= miniupnpd
+dir_$(CONFIG_FIRMWARE_INCLUDE_NET_SNMP)		+= net-snmp
 dir_y						+= dnsmasq
 dir_y						+= igmpproxy
 dir_y						+= udpxy

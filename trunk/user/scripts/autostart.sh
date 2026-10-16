@@ -95,3 +95,10 @@ if [ $(nvram get frpc_enable) = 1 ] ; then
 logger -t "自动启动" "正在启动frp client"
 /usr/bin/frp.sh start
 fi
+
+# net-snmp: expose the ARP table (1.3.6.1.2.1.4.22) for upstream SNMP
+# layer-3 discovery (e.g. iKuai Q3000 reading real MACs behind this router).
+if [ -x /usr/bin/snmpd.sh ] ; then
+logger -t "自动启动" "正在启动snmpd"
+/usr/bin/snmpd.sh start
+fi

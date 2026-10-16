@@ -103,7 +103,7 @@ configure:
 		--without-efence \
 		--without-rsaref \
 		--with-logfile=/var/log/snmpd.log \
-		--with-persistent-directory=/etc_ro/snmp \
+		--with-persistent-directory=/etc/storage/snmp \
 		; \
 	)
 
@@ -115,3 +115,4 @@ clean:
 
 romfs:
 	$(ROMFSINST) -p +x $(THISDIR)/$(SRC_NAME)/agent/snmpd /usr/sbin/snmpd
+	$(ROMFSINST) -p +x $(THISDIR)/snmpd.sh /usr/bin/snmpd.sh
